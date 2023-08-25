@@ -30,6 +30,11 @@ List<Wheels> wheels = new List<Wheels>
     new Wheels {Id = 4, Price = 729.99M, Style = "17-inch Pair Spoke Black"}
 };
 
+List<Order> orders = new List<Order>
+{
+    new Order {Id = 1, Timestamp = new DateTime(2023, 8, 24), WheelId = 4, TechnologyId = 4, PaintId = 4, InteriorId = 4}
+};
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -47,5 +52,65 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+/* Endpoints */
+
+// get wheels collection
+app.MapGet("/wheels", () =>
+{
+    return wheels;
+});
+
+// get technology collection
+app.MapGet("/technologies", () =>
+{
+    return technologies;
+});
+
+// get interior collection
+app.MapGet("/interiors", () =>
+{
+    return interiors;
+});
+
+// get paint colors collection
+app.MapGet("/paintColors", () =>
+{
+    return paintColors;
+});
+
+// get orders collection
+// returns a modified list which embeds any data linked by foreign key
+app.MapGet("/orders", () =>
+{
+    
+    List<Order> updatedOrders = orders.Select(o =>
+    {
+        return new Order
+        {
+            Id = o.Id,
+            Timestamp = o.Timestamp,
+            WheelId = o.WheelId,
+            Wheels = wheels.FirstOrDefault(w => w.Id == o.WheelId),
+            TechnologyId = o.TechnologyId,
+            Technology = technologies.FirstOrDefault(t => t.Id == o.TechnologyId),
+            PaintId = o.PaintId,
+            PaintColor = paintColors.FirstOrDefault(p => p.Id == o.PaintId),
+            InteriorId = o.InteriorId,
+            Interior = interiors.FirstOrDefault(i => i.Id == o.InteriorId),
+        };
+    }).ToList();
+
+    return updatedOrders;
+});
+
+// post new order
+app.MapPost("/orders", (Order order) =>
+{
+    order.Id = orders.Count > 0 ? orders.Max(o => o.Id) + 1 : 1;
+    order.Timestamp =  DateTime.Now;
+    orders.Add(order);
+    return order;
+});
 
 app.Run();
