@@ -115,7 +115,7 @@ app.MapGet("/orders", () =>
 app.MapPost("/orders", (Order order) =>
 {
     order.Id = orders.Count > 0 ? orders.Max(o => o.Id) + 1 : 1;
-    order.Timestamp =  DateTime.Now;
+    order.Timestamp = DateTime.Now;
     orders.Add(order);
     return order;
 });

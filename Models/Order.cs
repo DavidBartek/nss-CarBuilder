@@ -10,4 +10,25 @@ public class Order
     public PaintColor PaintColor { get; set; }
     public int InteriorId { get; set; }
     public Interior Interior { get; set; }
+    public decimal TotalCost
+    {
+        get
+        {
+            decimal price = 0;
+
+            if (Wheels != null)
+                price += Wheels.Price;
+
+            if (Technology != null)
+                price += Technology.Price;
+
+            if (PaintColor != null)
+                price += PaintColor.Price;
+
+            if (Interior != null)
+                price += Interior.Price;
+                
+            return price;
+        }
+    }
 }
