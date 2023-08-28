@@ -32,7 +32,7 @@ List<Wheels> wheels = new List<Wheels>
 
 List<Order> orders = new List<Order>
 {
-    new Order {Id = 1, Timestamp = new DateTime(2023, 8, 24), WheelId = 4, TechnologyId = 4, PaintId = 4, InteriorId = 4}
+    new Order {Id = 1, Timestamp = new DateTime(2023, 8, 24), WheelId = 4, TechnologyId = 4, PaintId = 4, InteriorId = 4, Fulfilled = false}
 };
 
 var builder = WebApplication.CreateBuilder(args);
@@ -116,8 +116,16 @@ app.MapPost("/orders", (Order order) =>
 {
     order.Id = orders.Count > 0 ? orders.Max(o => o.Id) + 1 : 1;
     order.Timestamp = DateTime.Now;
+    order.Fulfilled = false;
     orders.Add(order);
     return order;
+});
+
+// post "completed" (fulfilled = true) to a given order object, accessed by id in parameter
+app.MapPost("/orders/{orderId}/fulfill", (int orderId) =>
+{
+    orders[orderId - 1].Fulfilled = true;
+    return orders[orderId - 1];
 });
 
 app.Run();

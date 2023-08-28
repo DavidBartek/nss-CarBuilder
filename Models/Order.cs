@@ -1,3 +1,5 @@
+using Microsoft.Net.Http.Headers;
+
 public class Order
 {
     public int Id { get; set; }
@@ -10,6 +12,7 @@ public class Order
     public PaintColor PaintColor { get; set; }
     public int InteriorId { get; set; }
     public Interior Interior { get; set; }
+    public bool Fulfilled { get; set; }
     public decimal TotalCost
     {
         get
