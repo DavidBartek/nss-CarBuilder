@@ -90,25 +90,27 @@ app.MapGet("/paintColors", () =>
 // returns a modified list which embeds any data linked by foreign key
 app.MapGet("/orders", () =>
 {
-    
-    List<Order> updatedOrders = orders.Select(o =>
-    {
-        return new Order
-        {
-            Id = o.Id,
-            Timestamp = o.Timestamp,
-            WheelId = o.WheelId,
-            Wheels = wheels.FirstOrDefault(w => w.Id == o.WheelId),
-            TechnologyId = o.TechnologyId,
-            Technology = technologies.FirstOrDefault(t => t.Id == o.TechnologyId),
-            PaintId = o.PaintId,
-            PaintColor = paintColors.FirstOrDefault(p => p.Id == o.PaintId),
-            InteriorId = o.InteriorId,
-            Interior = interiors.FirstOrDefault(i => i.Id == o.InteriorId),
-        };
-    }).ToList();
 
-    return updatedOrders;
+    // filters out orders marked as fulfilled
+    orders = orders.Where(o => o.Fulfilled == false).ToList();
+
+    // return orders with Wheels, Tech, etc. expanded based on foreign key
+    foreach (Order o in orders)
+    {
+        o.Id = o.Id;
+        o.Timestamp = o.Timestamp;
+        o.WheelId = o.WheelId;
+        o.Wheels = wheels.FirstOrDefault(w => w.Id == o.WheelId);
+        o.TechnologyId = o.TechnologyId;
+        o.Technology = technologies.FirstOrDefault(t => t.Id == o.TechnologyId);
+        o.PaintId = o.PaintId;
+        o.PaintColor = paintColors.FirstOrDefault(p => p.Id == o.PaintId);
+        o.InteriorId = o.InteriorId;
+        o.Interior = interiors.FirstOrDefault(i => i.Id == o.InteriorId);
+    }
+
+    return orders;
+
 });
 
 // post new order
@@ -124,8 +126,10 @@ app.MapPost("/orders", (Order order) =>
 // post "completed" (fulfilled = true) to a given order object, accessed by id in parameter
 app.MapPost("/orders/{orderId}/fulfill", (int orderId) =>
 {
-    orders[orderId - 1].Fulfilled = true;
-    return orders[orderId - 1];
+    Order selectedOrder = orders.FirstOrDefault(o => o.Id == orderId);
+    selectedOrder.Fulfilled = true;
+
+    return selectedOrder;
 });
 
 app.Run();
